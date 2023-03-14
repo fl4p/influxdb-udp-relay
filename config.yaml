@@ -1,0 +1,19 @@
+name: "udp-relay"
+description: ""
+version: "0.1"
+slug: "udp-relay"
+init: false
+host_network: true
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+#host_dbus: true
+#services:
+#  - mqtt:need
+options:
+  udp_port: 8001
+schema:
+  udp_port: "int"

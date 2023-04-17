@@ -1,6 +1,6 @@
-name: "udp-relay"
-description: ""
-version: "0.1"
+name: "influxdb-udp-relay"
+description: "Receives points in UDP line protocol and forwards to InfluxDB v1 HTTP API"
+version: "0.3"
 slug: "udp-relay"
 init: false
 host_network: true
@@ -14,6 +14,6 @@ arch:
 #services:
 #  - mqtt:need
 options:
-  udp_port: 8001
+  udp_port: 8086
 schema:
   udp_port: "int"

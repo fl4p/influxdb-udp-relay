@@ -19,8 +19,9 @@ def read_hass_configuration_yaml():
             with open(fn, "r") as fp:
                 return yaml.safe_load(fp)
                 #return yaml.load(fp, Loader=yaml.Loader)
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             pass
+    raise FileNotFoundError('none of these files found %s' % files)
 
 
 def read_user_options():
@@ -31,6 +32,7 @@ def read_user_options():
                 return json.load(f)
         except FileNotFoundError:
             pass
+    raise FileNotFoundError('none of these files found %s' % files)
 
 if __name__ == "__main__":
     conf = read_hass_configuration_yaml()

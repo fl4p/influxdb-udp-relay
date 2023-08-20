@@ -1,6 +1,6 @@
 name: "influxdb-udp-relay"
 description: "Receives points in UDP line protocol and forwards to InfluxDB v1 HTTP API"
-version: "0.5"
+version: "0.6"
 slug: "influxdb-udp-relay"
 init: false
 host_network: true
@@ -16,7 +16,16 @@ arch:
 
 map:
   - config:ro
+
 options:
   udp_port: 8086
+
 schema:
   udp_port: "int"
+  additional_servers:
+    - host: str
+      port: "int(1,65535)?"
+      ssl: bool?
+      username: str
+      password: str
+      database: str

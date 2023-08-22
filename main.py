@@ -14,6 +14,9 @@ UDP_IP = "0.0.0.0"
 
 logger = get_logger()
 
+import urllib3.exceptions
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 
 class InfluxDBWriter():
 

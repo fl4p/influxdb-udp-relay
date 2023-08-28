@@ -26,4 +26,15 @@ influxdb:
   default_measurement: state
 ```
 
-If `host` is specified it falls back to "homeassistant.local"
+If `host` is not specified it falls back to "homeassistant.local"
+
+You can add additinional remote / cloud servers through the options array `additional_servers`.
+```
+additional_servers:
+  - host: "example.com"
+    port: 8086
+    ssl: true
+    username: ""
+    password: ""
+    database: ""
+```

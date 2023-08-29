@@ -15,6 +15,7 @@ UDP_IP = "0.0.0.0"
 logger = get_logger()
 
 import urllib3.exceptions
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
@@ -37,20 +38,22 @@ class InfluxDBWriter():
 
     def __init__(self, influxdb_conf):
         host = influxdb_conf.get('host', "homeassistant.local")
+        port = int(influxdb_conf.get('port', 8086))
         user = influxdb_conf.get('username')
+        ssl = influxdb_conf.get('ssl', False)
 
-        logger.info('Connecting InfluxDB %s@%s', user, host)
+        logger.info('Connecting InfluxDB %s@%s (port=%i ssl=%s)', user, host, port, ssl)
 
         self.client = influxdb.InfluxDBClient(
             host=host,
-            port=int(influxdb_conf.get('port', 8086)),
+            port=port,
             # username="home_assistant", password="h0me",
             # username="hass", password="caravana",
             username=user,
             password=influxdb_conf.get('password'),
             database=influxdb_conf.get('database'),
-            ssl=influxdb_conf.get('ssl', False),
-            verify_ssl=False, #influxdb_conf.get('ssl', False),
+            ssl=ssl,
+            verify_ssl=False,  # influxdb_conf.get('ssl', False),
         )
 
         logger.info('Measurements: %s', ','.join(map(lambda m: m.get('name', m), self.client.get_list_measurements())))

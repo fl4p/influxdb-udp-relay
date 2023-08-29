@@ -2,9 +2,20 @@ import json
 
 import yaml
 
+# these custom tags secretly register with the loader (yaml.SafeLoader)
 class _YamlIncludeDummy(yaml.YAMLObject):
     yaml_loader = yaml.SafeLoader
     yaml_tag = '!include'
+    def __init__(self, val):
+        self.val = val
+
+    @classmethod
+    def from_yaml(cls, loader, node):
+        return cls(node.value)
+
+class _YamlIncludeDirMergeNamedDummy(yaml.YAMLObject):
+    yaml_loader = yaml.SafeLoader
+    yaml_tag = '!include_dir_merge_named'
     def __init__(self, val):
         self.val = val
 

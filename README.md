@@ -28,7 +28,7 @@ influxdb:
 
 If `host` is not specified it falls back to "homeassistant.local"
 
-You can add additinional remote / cloud servers through the options array `additional_servers`.
+You can add additional remote / cloud servers through the add-on options array `additional_servers`.
 ```
 additional_servers:
   - host: "example.com"
@@ -38,3 +38,9 @@ additional_servers:
     password: ""
     database: ""
 ```
+
+
+# Note about loading Home Assistant `configuration.yaml`
+HA implements custom yaml tags, that need to be registered with a constructor so the YAML loader knows how to construct objects from the tag.
+Otherwise you'll get an error similar to `yaml.constructor.ConstructorError: could not determine a constructor for the tag '!secrets'`.
+You find a list of HA specific tags in [util/yaml/loader.py](https://github.com/home-assistant/core/blob/dev/homeassistant/util/yaml/loader.py#L401)

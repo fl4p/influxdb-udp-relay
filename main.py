@@ -47,13 +47,12 @@ class InfluxDBWriter():
         self.client = influxdb.InfluxDBClient(
             host=host,
             port=port,
-            # username="home_assistant", password="h0me",
-            # username="hass", password="caravana",
             username=user,
             password=influxdb_conf.get('password'),
             database=influxdb_conf.get('database'),
             ssl=ssl,
-            verify_ssl=False,  # influxdb_conf.get('ssl', False),
+            verify_ssl=False,
+            # org="" # influxdb v1 had no org
         )
 
         logger.info('Measurements: %s', ','.join(map(lambda m: m.get('name', m), self.client.get_list_measurements())))
@@ -96,7 +95,7 @@ def main():
     # client = InfluxDBClient(
     #    "http://homeassistant.local:8086",
     #               username="home_assistant",
-    #               password="h0me",
+    #               password="",
     #               org="" # influxdb v1 had no org
     #               )
     # write = client.write_api(write_options=SYNCHRONOUS)

@@ -1,5 +1,6 @@
 import queue
 import socket
+import sys
 import time
 from threading import Thread
 from typing import List
@@ -30,7 +31,7 @@ class InfluxDBWriter():
             if len(batch) > 0:
                 logger.info('Writing %d (max msg len=%d)', len(batch), max_msg_len)
                 try:
-                    self.client.write(batch, protocol='line', params=dict(db='open_pe', precision='ms'))
+                    self.client.write(batch, protocol='line', params=dict(db=self.client._database, precision='ms'))
                 except Exception as e:
                     logger.error('Error writing batch: %s', e)
 
@@ -100,8 +101,12 @@ def main():
     #               )
     # write = client.write_api(write_options=SYNCHRONOUS)
 
-    config = ha.read_hass_configuration_yaml()
-    influxdb_conf = config.get('influxdb', None)
+    try:
+        config = ha.read_hass_configuration_yaml()
+        influxdb_conf = config.get('influxdb', None)
+    except Exception as e:
+        logger.warning('Failed to load configuration: %s', str(e) or type(e))
+        influxdb_conf = None
 
     writers = []
 
@@ -110,6 +115,10 @@ def main():
 
     for influxdb_conf in opt.get('additional_servers', []):
         writers.append(InfluxDBWriter(influxdb_conf))
+
+    if len(writers) == 0:
+        logger.error('No servers!')
+        sys.exit(1)
 
     receive_loop(writers)
 

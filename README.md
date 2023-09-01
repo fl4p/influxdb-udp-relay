@@ -44,3 +44,25 @@ additional_servers:
 HA implements custom yaml tags, that need to be registered with a constructor so the YAML loader knows how to construct objects from the tag.
 Otherwise you'll get an error similar to `yaml.constructor.ConstructorError: could not determine a constructor for the tag '!secrets'`.
 You find a list of HA specific tags in [util/yaml/loader.py](https://github.com/home-assistant/core/blob/dev/homeassistant/util/yaml/loader.py#L401)
+
+
+# Standalone
+
+/usr/lib/systemd/system/influxdb-udp-relay.service:
+```
+[Unit]
+Description=InfluxDB UDP relay
+
+[Service]
+Type=simple
+Restart=always
+User=alarm
+WorkingDirectory=/home/alarm/influxdb-udp-relay
+ExecStart=/usr/bin/env ../venv/bin/python3 main.py
+
+[Install]
+WantedBy=multi-user.target
+
+
+```
+

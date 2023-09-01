@@ -38,20 +38,26 @@ class InfluxDBWriter():
             time.sleep(.2)
 
     def __init__(self, influxdb_conf):
-        host = influxdb_conf.get('host', "homeassistant.local")
-        port = int(influxdb_conf.get('port', 8086))
-        user = influxdb_conf.get('username')
-        ssl = influxdb_conf.get('ssl', False)
+        self.host = influxdb_conf.get('host', "homeassistant.local")
+        self.port = int(influxdb_conf.get('port', 8086))
+        self.user = influxdb_conf.get('username')
+        self.ssl = influxdb_conf.get('ssl', False)
+        self.db = influxdb_conf.get('database')
+        self.influxdb_conf = influxdb_conf
 
-        logger.info('Connecting InfluxDB %s@%s (port=%i ssl=%s)', user, host, port, ssl)
+        self.key = f'{self.host}:{self.port}/{self.db}'
+
+    def connect(self):
+
+        logger.info('Connecting InfluxDB %s@%s (port=%i ssl=%s)', self.user, self.host, self.port, self.ssl)
 
         self.client = influxdb.InfluxDBClient(
-            host=host,
-            port=port,
-            username=user,
-            password=influxdb_conf.get('password'),
-            database=influxdb_conf.get('database'),
-            ssl=ssl,
+            host=self.host,
+            port=self.port,
+            username=self.user,
+            password=self.influxdb_conf.get('password'),
+            database=self.db,
+            ssl=self.ssl,
             verify_ssl=False,
             # org="" # influxdb v1 had no org
         )
@@ -108,19 +114,24 @@ def main():
         logger.warning('Failed to load configuration: %s', str(e) or type(e))
         influxdb_conf = None
 
-    writers = []
+    writers = {}
 
     if influxdb_conf:
-        writers.append(InfluxDBWriter(influxdb_conf))
+        w = InfluxDBWriter(influxdb_conf)
+        writers[w.key] = w
 
     for influxdb_conf in opt.get('additional_servers', []):
-        writers.append(InfluxDBWriter(influxdb_conf))
+        w = InfluxDBWriter(influxdb_conf)
+        writers[w.key] = w
 
     if len(writers) == 0:
         logger.error('No servers!')
         sys.exit(1)
 
-    receive_loop(writers)
+    for w in writers.values():
+        w.connect()
+
+    receive_loop(list(writers.values()))
 
 
 main()

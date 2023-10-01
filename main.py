@@ -85,15 +85,22 @@ def receive_loop(writers: List[InfluxDBWriter]):
     sock.bind((UDP_IP, udp_port))
 
     while True:
-        data, addr = sock.recvfrom(1024 * 2)
-        if len(data) > max_msg_len:
-            max_msg_len = len(data)
+        try:
+            data, addr = sock.recvfrom(1024 * 2)
+            if len(data) > max_msg_len:
+                max_msg_len = len(data)
 
-        msg = data.decode("utf-8").rstrip('\n')
-        lines = msg.split('\n')
-        for l in lines:
-            for w in writers:
-                w.Q.put(l, block=False)
+            msg = data.decode("utf-8").rstrip('\n')
+            lines = msg.split('\n')
+            for l in lines:
+                for w in writers:
+                    w.Q.put(l, block=False)
+        except KeyboardInterrupt:
+            logger.info('caught KeyboardInterrupt, exiting')
+            break
+        except Exception:
+            logger.error('Error in rx loop:')
+            logger.error(sys.exc_info(), exc_info=True)
 
         # logger.info("msg (%dB, %dL, Q=%d) from %s: %s", len(data), len(lines), Q.qsize(), addr[0], msg[:60])
 
@@ -135,3 +142,4 @@ def main():
 
 
 main()
+sys.exit(1)

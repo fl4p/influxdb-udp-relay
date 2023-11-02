@@ -1,2 +1,4 @@
 influxdb==5.2.3
 pyyaml
+
+https://github.com/unixorn/ha-mqtt-discoverable/archive/refs/tags/v0.10.0.zip

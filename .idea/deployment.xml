@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="homeassistant.local (h26)" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
+  <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
     <option name="confirmBeforeUploading" value="false" />
     <serverData>
-      <paths name="homassistant.local caravan">
+      <paths name="homeassistant.local (project level)">
         <serverdata>
           <mappings>
             <mapping deploy="/influxdb-udp-relay" local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="homeassistant.local (h26)">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/udp-relay" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

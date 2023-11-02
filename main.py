@@ -79,6 +79,7 @@ def receive_loop(writers: List[InfluxDBWriter]):
     global max_msg_len
 
     udp_port = int(opt.get('udp_port', 8086))
+    log_points = bool(opt.get('log_points', False))
 
     logger.info("receiving on %s:%s", UDP_IP, udp_port)
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -93,6 +94,8 @@ def receive_loop(writers: List[InfluxDBWriter]):
             msg = data.decode("utf-8").rstrip('\n')
             lines = msg.split('\n')
             for l in lines:
+                if log_points:
+                    logger.info("[%s] P %s", addr, l)
                 for w in writers:
                     w.Q.put(l, block=False)
         except KeyboardInterrupt:

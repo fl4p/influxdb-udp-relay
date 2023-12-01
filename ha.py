@@ -27,7 +27,7 @@ for tag in [
 
 
 def read_hass_configuration_yaml():
-    files = ['/config/configuration.yaml', 'configuration.yaml']
+    files = ['/homeassistant/configuration.yaml', '/config/configuration.yaml', 'configuration.yaml']
     for fn in files:
         try:
             with open(fn, "r") as fp:

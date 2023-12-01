@@ -100,6 +100,8 @@ def receive_loop(writers: List[InfluxDBWriter]):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((UDP_IP, udp_port))
 
+    n_full = 0
+
     while True:
         try:
             data, addr = sock.recvfrom(1024 * 2)
@@ -113,9 +115,19 @@ def receive_loop(writers: List[InfluxDBWriter]):
                     logger.info("[%s] P %s", addr, l)
                 for w in writers:
                     w.Q.put(l, block=False)
+            n_full = 0
         except KeyboardInterrupt:
             logger.info('caught KeyboardInterrupt, exiting')
             break
+        except queue.Full:
+            n_full += 1
+            if n_full > 3:
+                logger.info('queue full, exiting')
+                time.sleep(writers[0].write_interval * 2)
+                break
+            else:
+                logger.info('queue full #%d', n_full)
+
         except Exception:
             logger.error('Error in rx loop:')
             logger.error(sys.exc_info(), exc_info=True)

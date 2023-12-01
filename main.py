@@ -146,8 +146,10 @@ def main():
         writers[w.key] = w
 
     for influxdb_conf in opt.get('additional_servers', []):
-        w = InfluxDBWriter(influxdb_conf)
-        writers[w.key] = w
+        host = influxdb_conf.get("host")
+        if host and host[0] != "#":
+            w = InfluxDBWriter(influxdb_conf)
+            writers[w.key] = w
 
     if len(writers) == 0:
         logger.error('No servers!')

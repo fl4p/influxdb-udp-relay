@@ -2,6 +2,7 @@ import queue
 import socket
 import sys
 import time
+import zlib
 from threading import Thread
 from typing import List
 
@@ -62,6 +63,19 @@ class InfluxDBWriter():
             verify_ssl=False,
             # org="" # influxdb v1 had no org
         )
+
+        def _request_gzip(data, headers, **kwargs):
+            if headers is None:
+                headers = {}
+            if data:
+                headers['content-encoding'] = 'gzip'
+                compress = zlib.compressobj(wbits=16 + zlib.MAX_WBITS)
+                data = compress.compress(data) + compress.flush()
+                headers['Content-Length'] = str(len(data))
+            return self.client._session.request_(data=data, headers=headers, **kwargs)
+
+        self.client._session.request_ = self.client._session.request
+        self.client._session.request = _request_gzip
 
         logger.info('Measurements: %s', ','.join(map(lambda m: m.get('name', m), self.client.get_list_measurements())))
 

@@ -35,15 +35,16 @@ class InfluxDBWriter():
                 except Exception as e:
                     logger.error('Error writing batch: %s', e)
 
-            time.sleep(.2)
+            time.sleep(self.write_interval)
 
-    def __init__(self, influxdb_conf):
+    def __init__(self, influxdb_conf, write_interval=.5):
         self.host = influxdb_conf.get('host', "homeassistant.local")
         self.port = int(influxdb_conf.get('port', 8086))
         self.user = influxdb_conf.get('username')
         self.ssl = influxdb_conf.get('ssl', False)
         self.db = influxdb_conf.get('database')
         self.influxdb_conf = influxdb_conf
+        self.write_interval = write_interval
 
         self.key = f'{self.host}:{self.port}/{self.db}'
 

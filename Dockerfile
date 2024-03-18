@@ -11,7 +11,10 @@ RUN apk add python3 py-pip
 
 COPY . .
 
-RUN pip3 install -r requirements.txt
-#RUN chmod a+x run.sh
+RUN python3 -m venv venv
+RUN venv/bin/pip3 install -r requirements.txt
 
-CMD [ "/usr/bin/python3", "main.py" ]
+# RUN . venv/bin/activate
+# RUN chmod a+x run.sh
+
+CMD [ "venv/bin/python3", "main.py" ]

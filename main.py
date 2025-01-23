@@ -89,6 +89,8 @@ max_msg_len = 0
 
 opt = read_user_options()
 
+addrs = set()
+
 
 def receive_loop(writers: List[InfluxDBWriter]):
     global max_msg_len
@@ -107,6 +109,10 @@ def receive_loop(writers: List[InfluxDBWriter]):
             data, addr = sock.recvfrom(1024 * 2)
             if len(data) > max_msg_len:
                 max_msg_len = len(data)
+
+            if addr not in addrs:
+                logger.info('received %r from %s', data[:40], addr)
+                addrs.add(addr)
 
             msg = data.decode("utf-8").rstrip('\n')
             lines = msg.split('\n')

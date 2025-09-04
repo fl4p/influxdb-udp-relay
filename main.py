@@ -80,7 +80,11 @@ class InfluxDBWriter():
         self.client._session.request_ = self.client._session.request
         self.client._session.request = _request_gzip
 
-        logger.info('Measurements: %s', ','.join(map(lambda m: m.get('name', m), self.client.get_list_measurements())))
+        try:
+            measurements = self.client.get_list_measurements()
+            logger.info('Measurements: %s', ','.join(map(lambda m: m.get('name', m), measurements)))
+        except Exception as e:
+            logger.warning('Error getting measurements: %s', e)
 
         self.Q = queue.Queue(200_000)
 

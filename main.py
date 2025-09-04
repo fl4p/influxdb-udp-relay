@@ -61,6 +61,8 @@ class InfluxDBWriter():
             database=self.db,
             ssl=self.ssl,
             verify_ssl=False,
+            timeout=10,
+            retries=self.influxdb_conf.get('max_retries', 3),
             # org="" # influxdb v1 had no org
         )
 

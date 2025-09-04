@@ -34,7 +34,8 @@ class InfluxDBWriter():
                 try:
                     self.client.write(batch, protocol='line', params=dict(db=self.client._database, precision='ms'))
                 except Exception as e:
-                    logger.error('Error writing batch: %s', e)
+                    logger.warning('Error writing batch: %s', e)
+                    time.sleep(self.write_interval)
 
             time.sleep(self.write_interval)
 

@@ -1,5 +1,4 @@
-ARG BUILD_FROM
-FROM $BUILD_FROM
+FROM ghcr.io/home-assistant/base:latest
 
 WORKDIR /app
 
@@ -12,7 +11,11 @@ RUN apk add python3 py-pip
 COPY . .
 
 RUN python3 -m venv venv
-RUN venv/bin/pip3 install -r requirements.txt
+# tamp (binary-protocol decode) ships a C speedup but falls back to pure Python;
+# transient build deps let pip compile it from sdist if no wheel exists for the arch.
+RUN apk add --no-cache --virtual .build gcc musl-dev python3-dev \
+ && venv/bin/pip3 install -r requirements.txt \
+ && apk del .build
 
 # RUN . venv/bin/activate
 # RUN chmod a+x run.sh

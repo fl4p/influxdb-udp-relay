@@ -11,6 +11,7 @@ import influxdb
 import ha
 from ha import read_user_options
 from util import get_logger
+import binary_lp
 
 UDP_IP = "0.0.0.0"
 
@@ -35,6 +36,8 @@ class InfluxDBWriter():
                     self.client.write(batch, protocol='line', params=dict(db=self.client._database, precision='ms'))
                 except Exception as e:
                     logger.warning('Error writing batch: %s', e)
+                    # logger.warning('Re-queuing batch of %d points', len(batch))
+                    # self.Q.put()
                     time.sleep(self.write_interval)
 
             time.sleep(self.write_interval)
@@ -98,6 +101,9 @@ opt = read_user_options()
 
 addrs = set()
 
+# per-device symbol tables for the binary wire protocol (keyed by source ip)
+binary_tables = {}
+
 
 def receive_loop(writers: List[InfluxDBWriter]):
     global max_msg_len
@@ -121,8 +127,20 @@ def receive_loop(writers: List[InfluxDBWriter]):
                 logger.info('received %r from %s', data[:40], addr)
                 addrs.add(addr)
 
-            msg = data.decode("utf-8").rstrip('\n')
-            lines = msg.split('\n')
+            # transparently detect the binary symbol-table wire protocol: it starts
+            # with a compressor-id byte (0x00/0x01); text line protocol starts with a
+            # printable measurement char (>= 0x20).
+            if binary_lp.looks_binary(data):
+                try:
+                    # key the symbol table by full (ip, port): behind NAT both devices
+                    # share the router's source IP but get distinct source ports, so
+                    # keying by ip alone merges their tables -> cross-device corruption.
+                    lines = binary_lp.decode(data, binary_tables, addr)
+                except Exception as e:
+                    logger.warning('binary decode error from %s: %s', addr, e)
+                    lines = []
+            else:
+                lines = data.decode("utf-8").rstrip('\n').split('\n')
             for l in lines:
                 if log_points:
                     logger.info("[%s] P %s", addr, l)

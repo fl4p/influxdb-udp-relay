@@ -6,7 +6,7 @@
       <paths name="homeassistant.local (project level)">
         <serverdata>
           <mappings>
-            <mapping deploy="/influxdb-udp-relay" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/addons/local/influxdb-udp-relay" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
